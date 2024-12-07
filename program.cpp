@@ -1,8 +1,10 @@
 #include <iostream>
 #include <limits>
+#include <iomanip>
 #include <unordered_map>
 
 using namespace std;
+int i = 0;
 
 struct produk{
     string namaProduk, kategori;
@@ -37,12 +39,54 @@ unordered_map<int, produk> daftarProduk = {
     {20, produk{"Teh Kotak Sosro 500ml", "Konsumsi", 7500}}
 };
 
-void tambahProdukKeKeranjang(){
+void tampilkanProduk(){
+    cout << left << setw(5)  << "ID" << 
+            left << setw(30) << "Produk" <<
+            left << setw(13) << "Kategori" <<
+            left << setw(7) << "Harga" << endl;
+    cout << setfill('-') << setw(60) << "-" << setfill(' ') << endl;
 
+    for (int j = 1; j < 21; j++){
+        cout << left << setw(5) << j << 
+                left << setw(30) << daftarProduk[j].namaProduk << 
+                left << setw(13) << daftarProduk[j].kategori << 
+                left << setw(7) << daftarProduk[j].harga << endl;
+    }
+}
+
+void tambahProdukKeKeranjang(barangDiKeranjang keranjang[]){
+    system("cls");
+    tampilkanProduk();
+    int id;
+    cout << "Masukkan ID barang : ";
+    cin >> id;
+    if (daftarProduk.find(id) == daftarProduk.end()) {
+        cout << "ID Produk tidak ditemukan!" << endl;
+        system("pause");
+        return;
+    }
+    cout << "Masukkan jumlah barang : ";
+    cin >> keranjang[i].jumlahBarang;
+    keranjang[i].hargaTotal = keranjang[i].jumlahBarang * daftarProduk[id].harga;
+    cout << "Harga Total: " << keranjang[i].hargaTotal << endl;
+    i++;
+    system("pause");
 }
 
 void cariProdukBerdasarkanId(){
-
+    system("cls");
+    int id;
+    cout << "Masukkan ID barang : ";
+    cin >> id;
+    if (daftarProduk.find(id) == daftarProduk.end()) {
+        cout << "ID Produk tidak ditemukan!" << endl;
+        system("pause");
+        return;
+    }
+    cout << "Barang : " << daftarProduk[id].namaProduk << endl;
+    cout << "Kategori : " << daftarProduk[id].kategori << endl;
+    cout << "Harga : " << daftarProduk[id].harga << endl;
+    system("pause");
 }
 
 void tampilkanBarangDiKeranjang(){
@@ -76,7 +120,7 @@ int main(){
         if(pilihanUser == 1){
 
         }else if(pilihanUser == 2){
-            tambahProdukKeKeranjang();
+            tambahProdukKeKeranjang(keranjang);
         }else if(pilihanUser == 3){
             cariProdukBerdasarkanId();
         }else if(pilihanUser == 4){
