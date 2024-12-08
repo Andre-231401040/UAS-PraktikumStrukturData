@@ -89,9 +89,62 @@ void cariProdukBerdasarkanId(){
     system("pause");
 }
 
-void tampilkanBarangDiKeranjang(){
+void tampilkanBarangDiKeranjang(barangDiKeranjang keranjang[], int& jumlahBarang){
+    system("cls");
+    // cek apakah keranjang kosong
+    if (jumlahBarang == 0) {
+        cout << "Keranjang belanja Anda kosong." << endl;
+        system("pause");
+        return;
+    }
+    // untuk menampilkan header tabel
+    cout << left << setw(5)  << "No" <<
+            left << setw(30) << "Produk" <<
+            left << setw(10) << "Jumlah" <<
+            left << setw(13) << "Harga Total" << endl;
+    cout << setfill('-') << setw(60) << "-" << setfill(' ') << endl;
 
+    // untuk menampilkan nomor, nama produk, jumlah barang, dan total harga
+    for (int j = 0; j < jumlahBarang; j++) {
+        cout << left << setw(5) << j + 1 <<
+                left << setw(30) << keranjang[j].barang.namaProduk <<
+                left << setw(10) << keranjang[j].jumlahBarang <<
+                left << setw(13) << keranjang[j].hargaTotal << endl;
+    }
+
+    system("pause");
 }
+
+void hapusBarangDariKeranjang(barangDiKeranjang keranjang[], int& jumlahBarang) {
+    system("cls");
+    int id;
+    cout << "Masukkan ID barang yang ingin dihapus: ";
+    cin >> id;
+
+    // false karena di awal barang belum ditemukan
+    bool ditemukan = false;
+    for (int j = 0; j < jumlahBarang; j++) {
+        // cek apakah nama produk pada keranjang[j] = nama produk pada daftarproduk[id]
+        if (keranjang[j].barang.namaProduk == daftarProduk[id].namaProduk) {
+            for (int k = j; k < jumlahBarang - 1; k++) {
+                keranjang[k] = keranjang[k + 1];
+            }
+            // satu barang dihapus, berarti jumlah total barang di keranjang juga harus berkurang
+            jumlahBarang--;
+            // id barang berhasil ditemukan dan dihapus
+            ditemukan = true;
+            cout << "Barang '" << daftarProduk[id].namaProduk << "' telah dihapus dari keranjang." << endl;
+            break;
+        }
+    }
+
+    if (!ditemukan) {
+        cout << "Barang dengan ID " << id << " tidak ditemukan di keranjang belanja." << endl;
+    }
+
+    system("pause");
+}
+
 
 int main(){
     short pilihanUser;
@@ -124,9 +177,9 @@ int main(){
         }else if(pilihanUser == 3){
             cariProdukBerdasarkanId();
         }else if(pilihanUser == 4){
-            tampilkanBarangDiKeranjang();
+            tampilkanBarangDiKeranjang(keranjang, i);
         }else if(pilihanUser == 5){
-            
+            hapusBarangDariKeranjang(keranjang, i); 
         }else if(pilihanUser == 6){
 
         }else if(pilihanUser == 7){
