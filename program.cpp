@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 using namespace std;
-int i = 0;
+// int i = 0;
 
 struct produk{
     string namaProduk, kategori;
@@ -41,115 +41,168 @@ unordered_map<int, produk> daftarProduk = {
 
 void tampilkanProduk(){
     cout << left << setw(5)  << "ID" << 
-            left << setw(30) << "Produk" <<
-            left << setw(13) << "Kategori" <<
-            left << setw(7) << "Harga" << endl;
-    cout << setfill('-') << setw(60) << "-" << setfill(' ') << endl;
+            left << setw(35) << "Produk" <<
+            left << setw(15) << "Kategori" <<
+            left << setw(10) << "Harga" << endl;
+    cout << setfill('-') << setw(65) << "-" << setfill(' ') << endl;
 
-    for (int j = 1; j < 21; j++){
-        cout << left << setw(5) << j << 
-                left << setw(30) << daftarProduk[j].namaProduk << 
-                left << setw(13) << daftarProduk[j].kategori << 
-                left << setw(7) << daftarProduk[j].harga << endl;
+    for (int i = 1; i <= 20; i++){
+        cout << left << setw(5) << i << 
+                left << setw(35) << daftarProduk[i].namaProduk << 
+                left << setw(15) << daftarProduk[i].kategori << 
+                left << setw(10) << daftarProduk[i].harga << endl;
     }
 }
 
-void tambahProdukKeKeranjang(barangDiKeranjang keranjang[]){
-    system("cls");
-    tampilkanProduk();
-    int id;
-    cout << "Masukkan ID barang : ";
-    cin >> id;
-    if (daftarProduk.find(id) == daftarProduk.end()) {
-        cout << "ID Produk tidak ditemukan!" << endl;
-        system("pause");
+void tambahProdukKeKeranjang(barangDiKeranjang (&keranjang)[20], short idBarang, short (&jumlahBarangDiKeranjang)){
+    if(idBarang < 1 || idBarang > 20){
+        system("cls");
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cout << "==============================" << endl;
+        cout << "Produk tidak ditemukan!" << endl;
+        cout << "==============================" << endl << endl;
         return;
     }
-    cout << "Masukkan jumlah barang : ";
-    cin >> keranjang[i].jumlahBarang;
-    keranjang[i].hargaTotal = keranjang[i].jumlahBarang * daftarProduk[id].harga;
-    cout << "Harga Total: " << keranjang[i].hargaTotal << endl;
-    i++;
-    system("pause");
+
+    bool ditemukan = false;
+    int jumlahBarang, i = 0;
+
+    for(i; i < jumlahBarangDiKeranjang; i++){
+        if(keranjang[i].barang.namaProduk == daftarProduk[idBarang].namaProduk){
+            ditemukan = true;
+            break;
+        }
+    }
+
+    cout << "Masukkan Jumlah Barang: ";
+    cin >> jumlahBarang;
+    if(ditemukan){
+        keranjang[i].jumlahBarang += jumlahBarang;
+        keranjang[i].hargaTotal = keranjang[i].jumlahBarang * keranjang[i].barang.harga;
+    }else{
+        keranjang[jumlahBarangDiKeranjang].barang.namaProduk = daftarProduk[idBarang].namaProduk;
+        keranjang[jumlahBarangDiKeranjang].barang.kategori = daftarProduk[idBarang].kategori;
+        keranjang[jumlahBarangDiKeranjang].barang.harga = daftarProduk[idBarang].harga;
+        keranjang[jumlahBarangDiKeranjang].jumlahBarang = jumlahBarang;
+        keranjang[jumlahBarangDiKeranjang].hargaTotal = keranjang[jumlahBarangDiKeranjang].jumlahBarang * keranjang[jumlahBarangDiKeranjang].barang.harga;
+        jumlahBarangDiKeranjang++;
+    }
+
+    system("cls");
+    cout << "========================================================================" << endl;
+    cout << jumlahBarang << " " << keranjang[i].barang.namaProduk << " berhasil ditambahkan ke keranjang." << endl;
+    cout << "========================================================================" << endl << endl;
 }
 
-void cariProdukBerdasarkanId(){
-    system("cls");
-    int id;
-    cout << "Masukkan ID barang : ";
-    cin >> id;
-    if (daftarProduk.find(id) == daftarProduk.end()) {
-        cout << "ID Produk tidak ditemukan!" << endl;
-        system("pause");
+void cariProdukBerdasarkanId(short idBarang){
+    if(idBarang < 1 || idBarang > 20){
+        system("cls");
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cout << "==============================" << endl;
+        cout << "Produk tidak ditemukan!" << endl;
+        cout << "==============================" << endl << endl;
         return;
     }
-    cout << "Barang : " << daftarProduk[id].namaProduk << endl;
-    cout << "Kategori : " << daftarProduk[id].kategori << endl;
-    cout << "Harga : " << daftarProduk[id].harga << endl;
-    system("pause");
+
+    cout << "Nama produk: " << daftarProduk[idBarang].namaProduk << endl;
+    cout << "Kategori: " << daftarProduk[idBarang].kategori << endl;
+    cout << "Harga: " << daftarProduk[idBarang].harga << endl << endl;
 }
 
-void tampilkanBarangDiKeranjang(barangDiKeranjang keranjang[], int& jumlahBarang){
+void tampilkanBarangDiKeranjang(barangDiKeranjang (&keranjang)[20], short (&jumlahBarangDiKeranjang)){
     system("cls");
+    int harusDibayar = 0;
     // cek apakah keranjang kosong
-    if (jumlahBarang == 0) {
-        cout << "Keranjang belanja Anda kosong." << endl;
-        system("pause");
+    if (jumlahBarangDiKeranjang == 0) {
+        cout << "=====================================" << endl;
+        cout << "Keranjang belanja Anda masih kosong." << endl;
+        cout << "=====================================" << endl << endl;
         return;
     }
+
     // untuk menampilkan header tabel
     cout << left << setw(5)  << "No" <<
-            left << setw(30) << "Produk" <<
+            left << setw(35) << "Produk" <<
+            left << setw(12) << "Harga" <<
             left << setw(10) << "Jumlah" <<
-            left << setw(13) << "Harga Total" << endl;
-    cout << setfill('-') << setw(60) << "-" << setfill(' ') << endl;
+            left << setw(15) << "Harga Total" << endl;
+    cout << setfill('-') << setw(75) << "-" << setfill(' ') << endl;
 
-    // untuk menampilkan nomor, nama produk, jumlah barang, dan total harga
-    for (int j = 0; j < jumlahBarang; j++) {
-        cout << left << setw(5) << j + 1 <<
-                left << setw(30) << keranjang[j].barang.namaProduk <<
-                left << setw(10) << keranjang[j].jumlahBarang <<
-                left << setw(13) << keranjang[j].hargaTotal << endl;
+    // untuk menampilkan nomor, nama produk, harga, jumlah barang, dan total harga
+    for (int i = 0; i < jumlahBarangDiKeranjang; i++) {
+        harusDibayar += keranjang[i].hargaTotal;
+        cout << left << setw(5) << i + 1 <<
+                left << setw(35) << keranjang[i].barang.namaProduk <<
+                left << setw(12) << keranjang[i].barang.harga <<
+                left << setw(10) << keranjang[i].jumlahBarang <<
+                left << setw(15) << keranjang[i].hargaTotal << endl;
     }
 
-    system("pause");
+    cout << setfill('-') << setw(75) << "-" << setfill(' ') << endl;
+    cout << left << setw(62) << "Harus Dibayar " <<
+            left << setw(15) << harusDibayar << endl;
+    cout << setfill('-') << setw(75) << "-" << setfill(' ') << endl << endl;
 }
 
-void hapusBarangDariKeranjang(barangDiKeranjang keranjang[], int& jumlahBarang) {
-    system("cls");
-    int id;
-    cout << "Masukkan ID barang yang ingin dihapus: ";
-    cin >> id;
+void hapusBarangDariKeranjang(barangDiKeranjang (&keranjang)[20], short idBarang, short (&jumlahBarangDiKeranjang)) {
+    if(idBarang < 1 || idBarang > 20){
+        system("cls");
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cout << "==============================" << endl;
+        cout << "Produk tidak ditemukan!" << endl;
+        cout << "==============================" << endl << endl;
+        return;
+    }
 
     // false karena di awal barang belum ditemukan
     bool ditemukan = false;
-    for (int j = 0; j < jumlahBarang; j++) {
-        // cek apakah nama produk pada keranjang[j] = nama produk pada daftarproduk[id]
-        if (keranjang[j].barang.namaProduk == daftarProduk[id].namaProduk) {
-            for (int k = j; k < jumlahBarang - 1; k++) {
-                keranjang[k] = keranjang[k + 1];
+    for (int i = 0; i < jumlahBarangDiKeranjang; i++) {
+        // cek apakah nama produk pada keranjang[i] = nama produk pada daftarproduk[idBarang]
+        if (keranjang[i].barang.namaProduk == daftarProduk[idBarang].namaProduk) {
+            if(i == jumlahBarangDiKeranjang - 1){
+                keranjang[i] = {};
+            }else{
+                for(int j = i; j < jumlahBarangDiKeranjang - 1; j++){
+                    keranjang[j] = keranjang[j + 1];
+                    keranjang[j + 1] = {};
+                }
             }
             // satu barang dihapus, berarti jumlah total barang di keranjang juga harus berkurang
-            jumlahBarang--;
-            // id barang berhasil ditemukan dan dihapus
+            jumlahBarangDiKeranjang--;
+            // idBarang berhasil ditemukan dan dihapus
             ditemukan = true;
-            cout << "Barang '" << daftarProduk[id].namaProduk << "' telah dihapus dari keranjang." << endl;
+            system("cls");
+            cout << "==================================================================" << endl;
+            cout << daftarProduk[idBarang].namaProduk << " telah dihapus dari keranjang." << endl;
+            cout << "==================================================================" << endl << endl;
             break;
         }
     }
 
     if (!ditemukan) {
-        cout << "Barang dengan ID " << id << " tidak ditemukan di keranjang belanja." << endl;
+        system("cls");
+        cout << "================================================================" << endl;
+        cout << "Barang dengan ID " << idBarang << " tidak ditemukan di keranjang belanja." << endl;
+        cout << "================================================================" << endl << endl;
     }
-
-    system("pause");
 }
 
-
 int main(){
-    short pilihanUser;
-    // Anggap jumlah barang di keranjang maksimal 100
-    barangDiKeranjang keranjang[100];
+    short idBarang, pilihanUser, jumlahBarangDiKeranjang = 0;
+    // Jumlah barang di keranjang maksimal 20
+    barangDiKeranjang keranjang[20];
 
     do {
         system("cls");
@@ -173,13 +226,49 @@ int main(){
         if(pilihanUser == 1){
 
         }else if(pilihanUser == 2){
-            tambahProdukKeKeranjang(keranjang);
+            tambahLagi:
+            system("cls");
+            char tambahLagi;
+            tampilkanProduk();
+            cout << endl << "Masukkan ID Barang: ";
+            cin >> idBarang;
+            tambahProdukKeKeranjang(keranjang, idBarang, jumlahBarangDiKeranjang);
+
+            cout << "Mau tambah lagi [y/n]: ";
+            cin >> tambahLagi;
+            if(tambahLagi == 'y' || tambahLagi == 'Y'){
+                goto tambahLagi;
+            }
         }else if(pilihanUser == 3){
-            cariProdukBerdasarkanId();
+            cariLagi:
+            system("cls");
+            char cariLagi;
+            cout << "Masukkan ID Barang: ";
+            cin >> idBarang;
+            cariProdukBerdasarkanId(idBarang);
+
+            cout << "Mau cari lagi [y/n]: ";
+            cin >> cariLagi;
+            if(cariLagi == 'y' || cariLagi == 'Y'){
+                goto cariLagi;
+            }
         }else if(pilihanUser == 4){
-            tampilkanBarangDiKeranjang(keranjang, i);
+            tampilkanBarangDiKeranjang(keranjang, jumlahBarangDiKeranjang);
+            system("pause");
         }else if(pilihanUser == 5){
-            hapusBarangDariKeranjang(keranjang, i); 
+            hapusLagi:
+            system("cls");
+            char hapusLagi;
+            tampilkanProduk();
+            cout << endl << "Masukkan ID Barang: ";
+            cin >> idBarang;
+            hapusBarangDariKeranjang(keranjang, idBarang, jumlahBarangDiKeranjang);
+
+            cout << "Mau hapus lagi [y/n]: ";
+            cin >> hapusLagi;
+            if(hapusLagi == 'y' || hapusLagi == 'Y'){
+                goto hapusLagi;
+            }
         }else if(pilihanUser == 6){
 
         }else if(pilihanUser == 7){
@@ -199,7 +288,7 @@ int main(){
                     cin.ignore(numeric_limits<streamsize>::max(), '\n');
                 }
                 cout << "==================================" << endl;
-                cout << "Masukkan pilihan yang valid" << endl;
+                cout << "Masukkan pilihan yang valid." << endl;
                 cout << "==================================" << endl;
                 pilihanUser = 0;
                 system("pause");
