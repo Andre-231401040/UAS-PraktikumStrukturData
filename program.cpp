@@ -528,17 +528,48 @@ int main(){
                 }
             }
         }else if(pilihanUser == 8){
-            cout << jumlahRiwayatTransaksi << endl;
-            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].daftarBarang[0].namaProduk << endl;
-            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaBarang << endl;
-            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaJasa << endl;
-            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaOngkir << endl;
-            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaTotal << endl;
-            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].idPembelian << endl;
-            cout << put_time(localtime(&riwayatTransaksi[jumlahRiwayatTransaksi - 1].waktuTransaksi), "%Y-%m-%d %H:%M:%S") << endl;
-            system("pause");
+            system("cls");
+                if (jumlahRiwayatTransaksi == 0) {
+                    cout << "=====================================" << endl;
+                    cout << "Belum ada riwayat pembayaran." << endl;
+                    cout << "=====================================" << endl << endl;
+                } else {
+                    cout << "====================================================================================" << endl;
+                    cout << "ID Pembelian                       Waktu                      Total Harga           " << endl;
+                    cout << "====================================================================================" << endl;
+                    for (int i = 0; i < jumlahRiwayatTransaksi; i++) {
+                        cout << "     " <<riwayatTransaksi[i].idPembelian <<"                           "<<  
+                        put_time(localtime(&riwayatTransaksi[jumlahRiwayatTransaksi - 1].waktuTransaksi), "%Y-%m-%d") <<"                     "<< 
+                        riwayatTransaksi[i].hargaTotal << endl;
+                    }
+                }
+                system("pause");
         }else if(pilihanUser == 9){
-
+            cout << "Masukkan ID transaksi yang ingin dilihat: ";
+                cin >> idBarang;
+                if (idBarang > 0 && idBarang <= jumlahRiwayatTransaksi) {
+                    system("cls");
+                    cout << "Detail Transaksi ID :      " << riwayatTransaksi[idBarang - 1].idPembelian << endl;
+                    cout << "Waktu               :      " << put_time(localtime(&riwayatTransaksi[idBarang - 1].waktuTransaksi), "%Y-%m-%d %H:%M:%S") << endl;
+                    cout << "====================================================================================" << endl;
+                    cout << "                                    List Produk                                   \n";
+                    cout << "====================================================================================" << endl;
+                    for (auto& item : riwayatTransaksi[idBarang - 1].daftarBarang) {
+                        cout << "- " << item.namaProduk << endl;
+                    }
+                    cout << "====================================================================================" << endl;
+                    cout << "Harga Barang : Rp "<< riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaBarang << endl;
+                    cout << "Harga Jasa   : Rp "<< riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaJasa << endl;
+                    cout << "Harga Ongkir : Rp "<< riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaOngkir << endl;
+                    cout << "====================================================================================" << endl;
+                    cout << "Total Harga  : Rp " << riwayatTransaksi[idBarang - 1].hargaTotal << endl;
+                    cout << "====================================================================================" << endl;
+                } else {
+                    cout << "=====================================" << endl;
+                    cout << "      Transaksi tidak ditemukan!     " << endl;
+                    cout << "=====================================" << endl;
+                }
+                system("pause");
         }else{
             if(pilihanUser != 10){
                 system("cls");
