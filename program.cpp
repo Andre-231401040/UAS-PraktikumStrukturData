@@ -411,9 +411,9 @@ void bayar(barangDiKeranjang (keranjang)[20], dataTransaksi (&riwayatTransaksi)[
     system("pause");
 
     system("cls");
-    cout << "===========================" << endl;
+    cout << "==================================" << endl;
     cout << "Pembayaran berhasil!" << endl;
-    cout << "===========================" << endl << endl;
+    cout << "==================================" << endl << endl;
     jumlahRiwayatTransaksi++;
 }
 
