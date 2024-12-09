@@ -5,10 +5,9 @@
 #include <vector>
 #include <queue>
 #include <algorithm>
-#include <cctype>
+#include <chrono>
 
 using namespace std;
-// int i = 0;
 
 struct produk{
     string namaProduk, kategori;
@@ -18,6 +17,13 @@ struct produk{
 struct barangDiKeranjang{
     produk barang;
     int jumlahBarang, hargaTotal;
+};
+
+struct dataTransaksi{
+    vector<produk> daftarBarang;
+    short idPembelian;
+    time_t waktuTransaksi;
+    int hargaTotal, hargaBarang, hargaJasa, hargaOngkir;
 };
 
 unordered_map<int, produk> daftarProduk = {
@@ -241,8 +247,8 @@ void tampilkanBarangDiKeranjang(barangDiKeranjang (&keranjang)[20], short (&juml
             left << setw(35) << "Produk" <<
             left << setw(12) << "Harga" <<
             left << setw(10) << "Jumlah" <<
-            left << setw(15) << "Harga Total" << endl;
-    cout << setfill('-') << setw(75) << "-" << setfill(' ') << endl;
+            left << setw(18) << "Harga * Jumlah" << endl;
+    cout << setfill('-') << setw(80) << "-" << setfill(' ') << endl;
 
     // untuk menampilkan nomor, nama produk, harga, jumlah barang, dan total harga
     for (int i = 0; i < jumlahBarangDiKeranjang; i++) {
@@ -251,13 +257,12 @@ void tampilkanBarangDiKeranjang(barangDiKeranjang (&keranjang)[20], short (&juml
                 left << setw(35) << keranjang[i].barang.namaProduk <<
                 left << setw(12) << keranjang[i].barang.harga <<
                 left << setw(10) << keranjang[i].jumlahBarang <<
-                left << setw(15) << keranjang[i].hargaTotal << endl;
+                left << setw(18) << keranjang[i].hargaTotal << endl;
     }
 
-    cout << setfill('-') << setw(75) << "-" << setfill(' ') << endl;
-    cout << left << setw(62) << "Harus Dibayar " <<
-            left << setw(15) << harusDibayar << endl;
-    cout << setfill('-') << setw(75) << "-" << setfill(' ') << endl << endl;
+    cout << setfill('-') << setw(80) << "-" << setfill(' ') << endl;
+    cout << left << setw(62) << "Harga Barang " <<
+            left << setw(18) << harusDibayar << endl;
 }
 
 void hapusBarangDariKeranjang(barangDiKeranjang (&keranjang)[20], short idBarang, short (&jumlahBarangDiKeranjang)) {
@@ -307,9 +312,10 @@ void hapusBarangDariKeranjang(barangDiKeranjang (&keranjang)[20], short idBarang
     }
 }
 
-void hitungBiayaPengiriman() {
-    const int INF = numeric_limits<int>::max();
+int hitungBiayaPengiriman() {
+    int biayaPengiriman;
     const int jumlahTitik = 10;
+    const int INF = numeric_limits<int>::max();
     vector<vector<pair<int, int>>> graph(jumlahTitik);
 
     //peta
@@ -322,14 +328,22 @@ void hitungBiayaPengiriman() {
     graph[9] = {{7, 4}};
 
     //input lokasi
-    int tujuan;
+    short tujuan;
     cout << "Masukkan nomor titik tujuan (1-9): ";
     cin >> tujuan;
 
     if (tujuan <= 0 || tujuan >= jumlahTitik) {
+        system("cls");
+        if(cin.fail()){
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        }
+
+        cout << "===========================================================" << endl;
         cout << "Titik tujuan tidak valid! Masukkan angka antara 1-9." << endl;
+        cout << "===========================================================" << endl << endl;
         system("pause");
-        return;
+        return INF;
     }
 
     vector<int> jarak(jumlahTitik, INF);
@@ -360,17 +374,55 @@ void hitungBiayaPengiriman() {
     if (jarak[tujuan] == INF) {
         cout << "Tidak ada jalur yang tersedia ke titik tujuan." << endl;
     } else {
-        int biayaPengiriman = jarak[tujuan] * 3000;
+        biayaPengiriman = jarak[tujuan] * 3000;
         cout << "Jarak ke titik tujuan: " << jarak[tujuan] << " km" << endl;
         cout << "Biaya pengiriman: Rp. " << biayaPengiriman << endl;
     }
+
     system("pause");
+    return biayaPengiriman;
+}
+
+void bayar(barangDiKeranjang (keranjang)[20], dataTransaksi (&riwayatTransaksi)[50], short (&jumlahBarangDiKeranjang), short (&jumlahRiwayatTransaksi)){
+    auto ambilWaktu = chrono::system_clock::now();
+    time_t waktuSekarang = chrono::system_clock::to_time_t(ambilWaktu);
+
+    int hargaBarang = 0;
+    for (int i = 0; i < jumlahBarangDiKeranjang; i++) {
+        hargaBarang += keranjang[i].hargaTotal;
+        riwayatTransaksi[jumlahRiwayatTransaksi].daftarBarang.push_back(keranjang[i].barang);
+        keranjang[i] = {};
+    }
+
+    jumlahBarangDiKeranjang = 0;
+    riwayatTransaksi[jumlahRiwayatTransaksi].idPembelian = jumlahRiwayatTransaksi + 1;
+    riwayatTransaksi[jumlahRiwayatTransaksi].waktuTransaksi = waktuSekarang;
+    riwayatTransaksi[jumlahRiwayatTransaksi].hargaBarang = hargaBarang;
+    riwayatTransaksi[jumlahRiwayatTransaksi].hargaJasa = 10000;
+    riwayatTransaksi[jumlahRiwayatTransaksi].hargaTotal = riwayatTransaksi[jumlahRiwayatTransaksi].hargaBarang + riwayatTransaksi[jumlahRiwayatTransaksi].hargaOngkir + riwayatTransaksi[jumlahRiwayatTransaksi].hargaJasa;
+
+    cout << left << setw(62) << "Ongkir " <<
+            left << setw(18) << riwayatTransaksi[jumlahRiwayatTransaksi].hargaOngkir << endl;
+    cout << left << setw(62) << "Harga Jasa " <<
+            left << setw(18) << riwayatTransaksi[jumlahRiwayatTransaksi].hargaJasa << endl;
+    cout << left << setw(62) << "Harga Total " <<
+            left << setw(18) << riwayatTransaksi[jumlahRiwayatTransaksi].hargaTotal << endl;
+    cout << setfill('-') << setw(80) << "-" << setfill(' ') << endl << endl;
+    system("pause");
+
+    system("cls");
+    cout << "===========================" << endl;
+    cout << "Pembayaran berhasil!" << endl;
+    cout << "===========================" << endl << endl;
+    jumlahRiwayatTransaksi++;
 }
 
 int main(){
-    short idBarang, pilihanUser, jumlahBarangDiKeranjang = 0;
+    short idBarang, pilihanUser, jumlahBarangDiKeranjang = 0, jumlahRiwayatTransaksi = 0;
     // Jumlah barang di keranjang maksimal 20
     barangDiKeranjang keranjang[20];
+    // Anggap riwayat transaksi maksimal 50
+    dataTransaksi riwayatTransaksi[50];
 
     do {
         system("cls");
@@ -422,6 +474,9 @@ int main(){
             }
         }else if(pilihanUser == 4){
             tampilkanBarangDiKeranjang(keranjang, jumlahBarangDiKeranjang);
+            if(jumlahBarangDiKeranjang != 0){
+                cout << setfill('-') << setw(80) << "-" << setfill(' ') << endl << endl;
+            }
             system("pause");
         }else if(pilihanUser == 5){
             hapusLagi:
@@ -438,11 +493,50 @@ int main(){
                 goto hapusLagi;
             }
         }else if(pilihanUser == 6){
+            cout << endl;
             hitungBiayaPengiriman();
         }else if(pilihanUser == 7){
+            char mauBayar, gantiTujuan;
+            tampilkanBarangDiKeranjang(keranjang, jumlahBarangDiKeranjang);
+            if(jumlahBarangDiKeranjang == 0){
+                system("pause");
+            }
 
+            if(jumlahBarangDiKeranjang != 0){
+                cout << setfill('-') << setw(80) << "-" << setfill(' ') << endl << endl;
+                cout << "Bayar [y/n]: ";
+                cin >> mauBayar;
+                if((mauBayar == 'y' || mauBayar == 'Y')){
+                    gantiTujuan:
+                    system("cls");
+                    tampilkanBarangDiKeranjang(keranjang, jumlahBarangDiKeranjang);
+                    cout << setfill('-') << setw(80) << "-" << setfill(' ') << endl << endl;
+
+                    riwayatTransaksi[jumlahRiwayatTransaksi].hargaOngkir = hitungBiayaPengiriman();
+                    cout << endl;
+
+                    cout << "Mau ganti tujuan [y/n]: ";
+                    cin >> gantiTujuan;
+                    if(gantiTujuan == 'y' || gantiTujuan == 'Y'){
+                        goto gantiTujuan;
+                    }
+
+                    system("cls");
+                    tampilkanBarangDiKeranjang(keranjang, jumlahBarangDiKeranjang);
+                    bayar(keranjang, riwayatTransaksi, jumlahBarangDiKeranjang, jumlahRiwayatTransaksi);
+                    system("pause");
+                }
+            }
         }else if(pilihanUser == 8){
-
+            cout << jumlahRiwayatTransaksi << endl;
+            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].daftarBarang[0].namaProduk << endl;
+            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaBarang << endl;
+            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaJasa << endl;
+            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaOngkir << endl;
+            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].hargaTotal << endl;
+            cout << riwayatTransaksi[jumlahRiwayatTransaksi - 1].idPembelian << endl;
+            cout << put_time(localtime(&riwayatTransaksi[jumlahRiwayatTransaksi - 1].waktuTransaksi), "%Y-%m-%d %H:%M:%S") << endl;
+            system("pause");
         }else if(pilihanUser == 9){
 
         }else{
